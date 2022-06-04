@@ -69,9 +69,59 @@ public class CourierTest
 
         var receipt = _courier.GetReceipt();
         
-        Assert.All(receipt, line => Assert.Contains("With Speedy Shipping", line));
+        Assert.All(receipt, line => Assert.Contains("Total Cost With Speedy Shipping", line));
     }
     
+    [Fact]
+    public void CalculateOrder_ShouldHaveSavingDetails()
+    {
+        var orderList = new List<Parcel>
+        {
+            new Parcel(2, 4, 6, 2),
+            new Parcel(3, 1, 4, 4),
+            new Parcel(10, 15, 4, 4),
+            new Parcel(2, 55, 6, 12),
+            new Parcel(2, 120, 6, 20),
+            new Parcel(2, 120, 6, 60),
+            new Parcel(2, 2, 7, 44),
+            new Parcel(2, 3, 5, 12)
+        };
+        
+        _courier.TickSpeedyShipping();
+        _courier.CalculateOrder(orderList);
+
+        var receipt = _courier.GetReceipt();
+        
+        Assert.All(receipt, line => Assert.Contains("Total Saved", line));
+    }
+
+    [Fact]
+    public void CalculateDiscounts_ShouldAssignDiscountCorrectly()
+    {
+        var orderList = new List<Parcel>
+        {
+            new Parcel(2, 4, 6, 2),
+            new Parcel(3, 1, 4, 4),
+            new Parcel(10, 15, 4, 4),
+            new Parcel(2, 55, 6, 12),
+            new Parcel(2, 120, 6, 20),
+            new Parcel(2, 120, 6, 60),
+            new Parcel(2, 2, 7, 44),
+            new Parcel(2, 3, 5, 12)
+        };
+
+        var orderListWithDiscounts = _courier.CalculateDiscounts(orderList);
+
+        var expectedNumberOfDiscounts = 2;
+
+        foreach (var kvp in orderListWithDiscounts)
+        {
+            if (kvp.Value == true)
+                expectedNumberOfDiscounts--;
+        }
+
+        Assert.True(expectedNumberOfDiscounts == 0);
+    }
     #endregion
     
 }

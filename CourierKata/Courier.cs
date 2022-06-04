@@ -4,6 +4,11 @@ public class Courier
 {
     private readonly List<string> _outputList;
     private bool _speedyShipping;
+    private const int SmallParcelMania = 4;
+    private const int MediumParcelMania = 3;
+    private const int MixedParcelMania = 5;
+    private const string Currency = "$";
+    
     public Courier()
     {
         _outputList = new List<string>();
@@ -12,16 +17,27 @@ public class Courier
     public void CalculateOrder(IEnumerable<Parcel> orderList)
     {
         double runningOrderTotal = 0;
-        foreach (var parcel in orderList)
+        double runningDiscountTotal = 0;
+        var orderListWithDiscountsApplied = CalculateDiscounts(orderList);
+        foreach (var (parcel, applyDiscount) in orderListWithDiscountsApplied)
         {
-            parcel.Type = GetParcelType(parcel);
-            var parcelTypeCost = CalculateTypeCost(parcel.Type);
-            var parcelOverweightCost = CalculateOverweightCost(parcel.Type, parcel.Weight);
-            runningOrderTotal += parcelTypeCost + parcelOverweightCost;
+            double parcelTypeCost = 0;
+            double parcelOverweightCost = 0;
+            if (applyDiscount)
+            {
+                runningDiscountTotal += CalculateTypeCost(parcel.Type);
+                runningDiscountTotal += CalculateOverweightCost(parcel.Type, parcel.Weight);
+            }
+            else
+            {
+                parcelTypeCost = CalculateTypeCost(parcel.Type, applyDiscount);
+                parcelOverweightCost = CalculateOverweightCost(parcel.Type, parcel.Weight, applyDiscount);
+                runningOrderTotal += parcelTypeCost + parcelOverweightCost;
+            }
 
             _outputList.Add(_speedyShipping
-                ? $"{parcel.Type} Parcel: ${parcelTypeCost}. Weight Cost: ${parcelOverweightCost}  Total Cost: ${runningOrderTotal}. With Speedy Shipping: ${runningOrderTotal * 2}"
-                : $"{parcel.Type} Parcel: ${parcelTypeCost}. Weight Cost: ${parcelOverweightCost}  Total Cost: ${runningOrderTotal}");
+                ? $"{parcel.Type} Parcel: {Currency}{parcelTypeCost}. Weight Cost: {Currency}{parcelOverweightCost}  Total Cost: {Currency}{runningOrderTotal}. Total Saved: {Currency}{runningDiscountTotal}. Total Cost With Speedy Shipping: {Currency}{runningOrderTotal * 2}"
+                : $"{parcel.Type} Parcel: {Currency}{parcelTypeCost}. Weight Cost: {Currency}{parcelOverweightCost}  Total Cost: {Currency}{runningOrderTotal}. Total Saved: {Currency}{runningDiscountTotal}. ");
         }
     }
 
@@ -38,8 +54,11 @@ public class Courier
         return _outputList;
     }
 
-    public double CalculateTypeCost(ParcelType parcelType)
+    public double CalculateTypeCost(ParcelType parcelType, bool applyDiscount = false)
     {
+        if (applyDiscount)
+            return 0;
+        
         switch (parcelType)
         {
             case ParcelType.Small:
@@ -60,8 +79,11 @@ public class Courier
         }
     }
     
-    public double CalculateOverweightCost(ParcelType parcelType, int parcelWeight)
+    public double CalculateOverweightCost(ParcelType parcelType, int parcelWeight, bool applyDiscount = false)
     {
+        if (applyDiscount)
+            return 0;
+        
         switch (parcelType)
         {
             case ParcelType.Small:
@@ -80,6 +102,53 @@ public class Courier
             default:
                 return parcelWeight <= 50 ? 0 : (parcelWeight - 50);
         }
+    }
+    
+    /* -- Summary --
+    Prioritising the most expensive option and making my way down to cheapest.
+    
+    The TryAdd protects against any duplication So there is a layer
+    of protection.
+    */
+    public IDictionary<Parcel, bool> CalculateDiscounts(IEnumerable<Parcel> orderList)
+    {
+        var mixedParcelDiscountCounter = 0;
+        var mediumParcelDiscountCounter = 0;
+        var smallParcelDiscountCounter = 0;
+
+        var parcelsWithDiscountTags = new Dictionary<Parcel, bool>();
+        
+        foreach (var parcel in orderList)
+        {
+            parcel.Type = GetParcelType(parcel);
+            switch (parcel.Type)
+            {
+                case ParcelType.Medium:
+                    mediumParcelDiscountCounter++;
+                    break;
+                case ParcelType.Small:
+                    smallParcelDiscountCounter++;
+                    break;
+            }
+            mixedParcelDiscountCounter++;
+
+            if (mixedParcelDiscountCounter != 0 && mixedParcelDiscountCounter % MixedParcelMania == 0)
+            {
+                parcelsWithDiscountTags.TryAdd(parcel, true);
+            }
+            else if (mediumParcelDiscountCounter != 0 && mediumParcelDiscountCounter % MediumParcelMania == 0)
+            {
+                parcelsWithDiscountTags.TryAdd(parcel, true);
+            }
+            else if (smallParcelDiscountCounter != 0 && smallParcelDiscountCounter % SmallParcelMania == 0)
+            {
+                parcelsWithDiscountTags.TryAdd(parcel, true);
+            }
+            
+            parcelsWithDiscountTags.TryAdd(parcel, false);
+        }
+
+        return parcelsWithDiscountTags;
     }
 
     public ParcelType GetParcelType(Parcel parcel)
@@ -100,7 +169,7 @@ public class Courier
         
         return ParcelType.XL;
     }
-    
+
     public void TickSpeedyShipping()
     {
         _speedyShipping = !_speedyShipping;
