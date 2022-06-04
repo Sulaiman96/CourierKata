@@ -14,7 +14,7 @@ public class Courier
         double runningOrderTotal = 0;
         foreach (var parcel in orderList)
         {
-            parcel.Type = GetParcelType(parcel.GetParcelSize());
+            parcel.Type = GetParcelType(parcel);
             var parcelTypeCost = CalculateTypeCost(parcel.Type);
             var parcelOverweightCost = CalculateOverweightCost(parcel.Type, parcel.Weight);
             runningOrderTotal += parcelTypeCost + parcelOverweightCost;
@@ -52,8 +52,11 @@ public class Courier
                 return 15.00;
 
             case ParcelType.XL:
-            default:
                 return 25.00;
+            
+            case ParcelType.Heavy:
+            default:
+                return 50.00;
         }
     }
     
@@ -71,14 +74,20 @@ public class Courier
                 return parcelWeight <= 6 ? 0 : (parcelWeight - 6) * 2;
 
             case ParcelType.XL:
-            default:
                 return parcelWeight <= 10 ? 0 : (parcelWeight - 10) * 2;
+            
+            case ParcelType.Heavy:
+            default:
+                return parcelWeight <= 50 ? 0 : (parcelWeight - 50);
         }
     }
 
-    public ParcelType GetParcelType((int, int, int) parcelSize)
+    public ParcelType GetParcelType(Parcel parcel)
     {
-        var (length, width, height) = parcelSize;
+        if (parcel.Weight >= 50)
+            return ParcelType.Heavy;
+        
+        var (length, width, height) = parcel.GetParcelSize();
 
         if (length < 10 && width < 10 && height < 10)
             return ParcelType.Small;
