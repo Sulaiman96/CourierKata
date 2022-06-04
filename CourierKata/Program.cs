@@ -2,8 +2,8 @@
 
 using CourierKata;
 
-Courier orderHandler = new Courier();
-List<Parcel> orderList = new List<Parcel>
+var orderHandler = new Courier();
+var orderList = new List<Parcel>
 {
     new Parcel(2, 4, 6),
     new Parcel(10, 15, 4),
@@ -11,5 +11,6 @@ List<Parcel> orderList = new List<Parcel>
     new Parcel(2, 120, 6)
 };
 
+orderHandler.TickSpeedyShipping();
 orderHandler.CalculateOrder(orderList);
 orderHandler.PrintReceipt();

@@ -1,10 +1,11 @@
-﻿using Xunit;
+﻿using System.Collections.Generic;
+using Xunit;
 
 namespace CourierKata.Tests;
 
 public class CourierTest
 {
-    readonly Courier _courier = new Courier();
+    private readonly Courier _courier = new Courier();
     
     [Theory]
     [InlineData(2, 5, 9, ParcelType.Small)]
@@ -15,7 +16,7 @@ public class CourierTest
     {
         (int, int, int) parcelSize = (length, width, height);
         
-        ParcelType actualType = Courier.GetParcelType(parcelSize);
+        var actualType = Courier.GetParcelType(parcelSize);
         
         Assert.Equal(expectedType, actualType);
     }
@@ -30,5 +31,24 @@ public class CourierTest
         var actualPrice = _courier.CalculateCost(parcelType);
         
         Assert.Equal(expectedPrice, actualPrice);
+    }
+
+    [Fact]
+    public void CalculateOrder_ShouldHaveShippingDetails()
+    {
+        var orderList = new List<Parcel>
+        {
+            new Parcel(2, 4, 6),
+            new Parcel(10, 15, 4),
+            new Parcel(2, 55, 6),
+            new Parcel(2, 120, 6)
+        };
+        
+        _courier.TickSpeedyShipping();
+        _courier.CalculateOrder(orderList);
+
+        var receipt = _courier.GetReceipt();
+        
+        Assert.All(receipt, line => Assert.Contains("With Speedy Shipping", line));
     }
 }

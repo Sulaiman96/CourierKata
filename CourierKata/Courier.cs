@@ -3,13 +3,13 @@
 public class Courier
 {
     private readonly List<string> _outputList;
-
+    private bool _speedyShipping;
     public Courier()
     {
         _outputList = new List<string>();
     }
 
-    public void CalculateOrder(List<Parcel> orderList)
+    public void CalculateOrder(IEnumerable<Parcel> orderList)
     {
         double runningOrderTotal = 0;
         foreach (var parcel in orderList)
@@ -17,8 +17,10 @@ public class Courier
             parcel.Type = GetParcelType(parcel.GetParcelSize());
             var parcelCost = CalculateCost(parcel.Type);
             runningOrderTotal += parcelCost;
-            
-            _outputList.Add($"{parcel.Type}: ${parcelCost}. Total Cost: ${runningOrderTotal}");
+
+            _outputList.Add(_speedyShipping
+                ? $"{parcel.Type}: ${parcelCost}. Total Cost: ${runningOrderTotal}. With Speedy Shipping: ${runningOrderTotal * 2}"
+                : $"{parcel.Type}: ${parcelCost}. Total Cost: ${runningOrderTotal}");
         }
     }
 
@@ -28,6 +30,11 @@ public class Courier
         {
             Console.WriteLine(order);
         }
+    }
+
+    public IEnumerable<string> GetReceipt()
+    {
+        return _outputList;
     }
 
     public double CalculateCost(ParcelType parcelType)
@@ -63,5 +70,10 @@ public class Courier
             return ParcelType.Large;
         
         return ParcelType.XL;
+    }
+    
+    public void TickSpeedyShipping()
+    {
+        _speedyShipping = !_speedyShipping;
     }
 }
