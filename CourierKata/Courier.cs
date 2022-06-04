@@ -15,12 +15,13 @@ public class Courier
         foreach (var parcel in orderList)
         {
             parcel.Type = GetParcelType(parcel.GetParcelSize());
-            var parcelCost = CalculateCost(parcel.Type);
-            runningOrderTotal += parcelCost;
+            var parcelTypeCost = CalculateTypeCost(parcel.Type);
+            var parcelOverweightCost = CalculateOverweightCost(parcel.Type, parcel.Weight);
+            runningOrderTotal += parcelTypeCost + parcelOverweightCost;
 
             _outputList.Add(_speedyShipping
-                ? $"{parcel.Type}: ${parcelCost}. Total Cost: ${runningOrderTotal}. With Speedy Shipping: ${runningOrderTotal * 2}"
-                : $"{parcel.Type}: ${parcelCost}. Total Cost: ${runningOrderTotal}");
+                ? $"{parcel.Type} Parcel: ${parcelTypeCost}. Weight Cost: ${parcelOverweightCost}  Total Cost: ${runningOrderTotal}. With Speedy Shipping: ${runningOrderTotal * 2}"
+                : $"{parcel.Type} Parcel: ${parcelTypeCost}. Weight Cost: ${parcelOverweightCost}  Total Cost: ${runningOrderTotal}");
         }
     }
 
@@ -37,7 +38,7 @@ public class Courier
         return _outputList;
     }
 
-    public double CalculateCost(ParcelType parcelType)
+    public double CalculateTypeCost(ParcelType parcelType)
     {
         switch (parcelType)
         {
@@ -55,8 +56,27 @@ public class Courier
                 return 25.00;
         }
     }
+    
+    public double CalculateOverweightCost(ParcelType parcelType, int parcelWeight)
+    {
+        switch (parcelType)
+        {
+            case ParcelType.Small:
+                return parcelWeight <= 1 ? 0 : (parcelWeight - 1) * 2; //I will assume we don't deal with weights in decimals.
+            
+            case ParcelType.Medium:
+                return parcelWeight <= 3 ? 0 : (parcelWeight - 3) * 2;
+            
+            case ParcelType.Large:
+                return parcelWeight <= 6 ? 0 : (parcelWeight - 6) * 2;
 
-    public static ParcelType GetParcelType((int, int, int) parcelSize)
+            case ParcelType.XL:
+            default:
+                return parcelWeight <= 10 ? 0 : (parcelWeight - 10) * 2;
+        }
+    }
+
+    public ParcelType GetParcelType((int, int, int) parcelSize)
     {
         var (length, width, height) = parcelSize;
 

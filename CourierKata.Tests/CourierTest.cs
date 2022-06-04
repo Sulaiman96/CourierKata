@@ -16,7 +16,7 @@ public class CourierTest
     {
         (int, int, int) parcelSize = (length, width, height);
         
-        var actualType = Courier.GetParcelType(parcelSize);
+        var actualType = _courier.GetParcelType(parcelSize);
         
         Assert.Equal(expectedType, actualType);
     }
@@ -28,7 +28,7 @@ public class CourierTest
     [InlineData(25.00, ParcelType.XL)]
     public void CalculateCost_ShouldReturnCostsCorrectly(double expectedPrice, ParcelType parcelType)
     {
-        var actualPrice = _courier.CalculateCost(parcelType);
+        var actualPrice = _courier.CalculateTypeCost(parcelType);
         
         Assert.Equal(expectedPrice, actualPrice);
     }
@@ -38,10 +38,10 @@ public class CourierTest
     {
         var orderList = new List<Parcel>
         {
-            new Parcel(2, 4, 6),
-            new Parcel(10, 15, 4),
-            new Parcel(2, 55, 6),
-            new Parcel(2, 120, 6)
+            new Parcel(2, 4, 6, 1),
+            new Parcel(10, 15, 4, 2),
+            new Parcel(2, 55, 6, 4),
+            new Parcel(2, 120, 6, 6)
         };
         
         _courier.TickSpeedyShipping();
@@ -50,5 +50,18 @@ public class CourierTest
         var receipt = _courier.GetReceipt();
         
         Assert.All(receipt, line => Assert.Contains("With Speedy Shipping", line));
+    }
+    
+    [Theory]
+    [InlineData(1, 0, ParcelType.Small)]
+    [InlineData(2, 2, ParcelType.Small)]
+    [InlineData(4, 2, ParcelType.Medium)]
+    [InlineData(10, 8, ParcelType.Large)]
+    [InlineData(25, 30, ParcelType.XL)]
+    public void CalculateOverweightCost_ShouldReturnOverweightCostCorrectly(int weight, int expectedOverweightCost, ParcelType parcelType)
+    {
+        var actualOverweightCost = _courier.CalculateOverweightCost(parcelType, weight);
+        
+        Assert.Equal(expectedOverweightCost, actualOverweightCost);
     }
 }
