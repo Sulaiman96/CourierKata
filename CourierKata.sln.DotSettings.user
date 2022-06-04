@@ -1,0 +1,11 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f37c851c_002Db112_002D489a_002D8f88_002Df9fec6140e02/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetParcelType_ShouldReturnCorrectType" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::D56FCDA8-CBB4-4133-9DC2-B3E61D9E960B::net6.0::CourierKata.Tests.CourierTest.GetParcelType_ShouldReturnCorrectType&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::D56FCDA8-CBB4-4133-9DC2-B3E61D9E960B::net6.0::CourierKata.Tests.ParcelTest.GetParcelSize_ShouldReturnTupleCorrectly&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::D56FCDA8-CBB4-4133-9DC2-B3E61D9E960B::net6.0::CourierKata.Tests.CourierTest.GetParcelType_ShouldReturnTypeCorrectly&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::D56FCDA8-CBB4-4133-9DC2-B3E61D9E960B::net6.0::CourierKata.Tests.CourierTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::D56FCDA8-CBB4-4133-9DC2-B3E61D9E960B::net6.0::CourierKata.Tests.ParcelTest.ConstructingFalseParcel_ShouldThrowArgumentException&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::D56FCDA8-CBB4-4133-9DC2-B3E61D9E960B::net6.0::CourierKata.Tests.ParcelTest&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
